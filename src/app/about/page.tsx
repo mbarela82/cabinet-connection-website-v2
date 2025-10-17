@@ -1,21 +1,21 @@
+import { Metadata } from "next";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "About Cabinet Connection | Albuquerque's Cabinet Experts Since 1994",
+  description:
+    "Learn about Cabinet Connection, a family-owned business serving the Albuquerque area with expert custom cabinetry since 1994.",
+};
+
 export default function AboutPage() {
   return (
     <main>
       {/* Page Header */}
-      <div
-        className="relative bg-cover bg-center py-24 text-white"
-        style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1572276596237-5db2c3e16c5d?q=80&w=2070&auto=format&fit=crop')",
-        }}
-      >
-        {/* This is the dark overlay */}
-        <div className="absolute inset-0 bg-black opacity-50"></div>
-
-        {/* This is your text content */}
-        <div className="relative container mx-auto text-center px-4">
-          <h1 className="text-5xl font-bold">Our Story</h1>
-          <p className="text-xl mt-2">
+      <div className="bg-gray-900">
+        <div className="container mx-auto text-center px-4 pt-32 pb-16">
+          <h1 className="text-5xl font-bold text-white">Our Story</h1>
+          <p className="text-xl text-gray-300 mt-2">
             A Family Tradition of Craftsmanship Since 1994
           </p>
         </div>
@@ -59,6 +59,22 @@ export default function AboutPage() {
           </p>
         </div>
       </div>
+
+      {/* Call to Action Section */}
+      <section className="py-20 px-4 bg-teal-600 text-white">
+        <div className="container mx-auto text-center">
+          <h2 className="text-4xl font-bold">
+            Partner With Our Family of Experts
+          </h2>
+          <p className="text-lg mt-2 mb-6 max-w-2xl mx-auto">
+            Now that you know our story, let's start writing yours. We bring
+            three decades of craftsmanship and family values to every project.
+          </p>
+          <Button asChild size="lg" variant="secondary">
+            <Link href="/contact">Get a Free Estimate</Link>
+          </Button>
+        </div>
+      </section>
     </main>
   );
 }

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu } from "lucide-react"; // Hamburger icon
+import { Menu } from "lucide-react";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -39,7 +39,9 @@ export default function Header() {
       <nav className="container mx-auto flex justify-between items-center p-4">
         <Link
           href="/"
-          className={`text-2xl font-bold transition-colors ${scrolled ? "text-gray-900" : "text-white"}`}
+          className={`text-2xl font-bold transition-colors ${
+            scrolled ? "text-gray-900" : "text-white"
+          }`}
         >
           Cabinet Connection
         </Link>
@@ -55,7 +57,7 @@ export default function Header() {
               {link.label}
             </Link>
           ))}
-          <Button asChild>
+          <Button asChild variant={scrolled ? "default" : "secondary"}>
             <Link href="/contact">Contact Us</Link>
           </Button>
         </div>

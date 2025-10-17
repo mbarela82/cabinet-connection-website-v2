@@ -1,37 +1,26 @@
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import ContactForm from "@/components/ContactForm";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Contact Us for a Free Custom Cabinet Quote | Albuquerque",
+  description:
+    "Ready to start your project? Contact Cabinet Connection today for a free, no-obligation quote on custom cabinets for your Albuquerque home.",
+};
 
 export default function ContactPage() {
   return (
     <main>
       {/* Page Header */}
-      <div className="bg-slate-100 py-16">
-        <div className="container mx-auto text-center px-4">
-          <h1 className="text-5xl font-bold">Contact Us</h1>
-          <p className="text-xl text-muted-foreground mt-2">
+      <div className="bg-gray-900">
+        <div className="container mx-auto text-center px-4 pt-32 pb-16">
+          <h1 className="text-5xl font-bold text-white">Contact Us</h1>
+          <p className="text-xl text-gray-300 mt-2">
             Let's start the conversation about your next project.
           </p>
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* Main Content - Form and Info Side-by-Side */}
       <div className="container mx-auto py-20 px-4">
         <div className="grid md:grid-cols-2 gap-12">
           {/* Column 1: Contact Info */}
@@ -80,6 +69,20 @@ export default function ContactPage() {
             <ContactForm />
           </div>
         </div>
+      </div>
+
+      {/* Full-Width Map Section */}
+      <div className="w-full h-96">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3263.8212389272567!2d-106.62328078796959!3d35.11117437266286!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8722747e76d53325%3A0xc0f3c84f828ac2aa!2sCabinet%20Connection!5e0!3m2!1sen!2sus!4v1760732572329!5m2!1sen!2sus"
+          width="100%"
+          height="100%"
+          style={{ border: 0 }}
+          allowFullScreen={true}
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          title="Google Map of Cabinet Connection Location"
+        ></iframe>
       </div>
     </main>
   );

@@ -1,17 +1,24 @@
+// next.config.js
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
     remotePatterns: [
+      // This one is for your Sanity images
       {
         protocol: "https",
-        hostname: "images.unsplash.com",
+        hostname: "cdn.sanity.io",
+        port: "",
+        pathname: "**",
       },
       {
         protocol: "https",
-        hostname: "res.cloudinary.com", // <-- ADD THIS
+        hostname: "images.unsplash.com",
+        port: "",
+        pathname: "**",
       },
     ],
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;

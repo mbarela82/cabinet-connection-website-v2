@@ -20,6 +20,13 @@ import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
 import Image from "next/image";
 import ContactForm from "@/components/ContactForm";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Custom Kitchen & Bath Cabinets in Albuquerque | Cabinet Connection",
+  description:
+    "Top-quality custom cabinet design and installation for kitchens, bathrooms, and more in the Albuquerque, NM area. Contact us for a free estimate.",
+};
 
 export default function Home() {
   return (

@@ -1,3 +1,8 @@
+import { Metadata } from "next";
+import { sanityClient } from "@/lib/sanity.client";
+import { notFound } from "next/navigation";
+import Image from "next/image";
+import { PortableText } from "@portabletext/react";
 import {
   Carousel,
   CarouselContent,
@@ -5,79 +10,87 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Card, CardContent } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
-// Interface for a single project
-interface Project {
-  id: number;
+interface SanityProject {
+  _id: string;
   title: string;
-  description: string;
   category: string;
-  slug: string;
-  images:
-    | {
-        url: string;
-        alternativeText: string | null;
-      }[]
-    | null;
+  excerpt: string;
+  description: any[];
+  images: {
+    url: string;
+    alt: string | null;
+  }[];
 }
 
-// Helper function to get the correct image URL
-const getImageUrl = (url: string) => {
-  if (url.startsWith("http")) {
-    return url; // It's a full URL from Cloudinary
-  }
-  return `http://localhost:1337${url}`; // It's a relative URL from local Strapi
-};
+export const revalidate = 60;
 
-// Function to fetch a single project by its slug
-async function getProjectBySlug(slug: string): Promise<Project | null> {
-  const strapiUrl = process.env.STRAPI_URL || "http://localhost:1337";
-  try {
-    const res = await fetch(
-      `${strapiUrl}/api/projects?filters[slug][$eq]=${slug}&populate=*`
-    );
-    if (!res.ok) {
-      return null;
-    }
-    const responseData = await res.json();
-    if (responseData.data.length === 0) {
-      return null;
-    }
-    return responseData.data[0];
-  } catch (error) {
-    console.error("Error fetching project:", error);
-    return null;
-  }
+export async function generateStaticParams() {
+  const query = `*[_type == "portfolio"]{ "slug": slug.current }`;
+  const slugs = await sanityClient.fetch<{ slug: string }[]>(query);
+  return slugs.map((item) => ({ slug: item.slug }));
 }
 
-export default async function ProjectDetailPage({
+async function getProjectBySlug(slug: string) {
+  const query = `*[_type == "portfolio" && slug.current == $slug][0]{
+    _id,
+    title,
+    category,
+    excerpt,
+    description,
+    "images": images[]{
+      "alt": alt,
+      "url": asset->url + '?fm=webp'
+    }
+  }`;
+
+  const project = await sanityClient.fetch<SanityProject>(query, { slug });
+  return project;
+}
+
+export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
-}) {
-  const project = await getProjectBySlug(params.slug);
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const project = await getProjectBySlug(slug);
 
   if (!project) {
-    return (
-      <div className="container mx-auto py-40 text-center">
-        Project not found.
-      </div>
-    );
+    return {
+      title: "Project Not Found | Cabinet Connection",
+    };
   }
 
-  const { title, category, images, description } = project;
+  return {
+    title: `${project.title} | Cabinet Connection Portfolio`,
+    description:
+      project.excerpt ||
+      `View details of the ${project.title} project by Cabinet Connection in Albuquerque, NM.`,
+  };
+}
+
+export default async function ProjectDetailPage(props: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await props.params;
+  const project = await getProjectBySlug(slug);
+
+  if (!project) {
+    notFound();
+  }
 
   return (
     <main>
       {/* Page Header */}
-      <div className="bg-slate-100 py-16">
-        <div className="container mx-auto text-center px-4">
-          <h1 className="text-5xl font-bold">{title}</h1>
-          <p className="text-xl text-muted-foreground mt-2 capitalize">
-            {category}
+      <div className="bg-gray-900">
+        <div className="container mx-auto text-center px-4 pt-32 pb-16">
+          <h1 className="text-5xl font-bold text-white">{project.title}</h1>
+          <p className="text-xl text-gray-300 mt-2 capitalize">
+            {project.category}
           </p>
         </div>
       </div>
@@ -86,23 +99,19 @@ export default async function ProjectDetailPage({
       <div className="container mx-auto py-20 px-4 max-w-4xl space-y-12">
         {/* Image Carousel */}
         <div>
-          {images && images.length > 0 ? (
+          {project.images && project.images.length > 0 ? (
             <Carousel className="w-full">
               <CarouselContent>
-                {images.map((image, index) => (
+                {project.images.map((image, index) => (
                   <CarouselItem key={index}>
-                    <Card>
-                      <CardContent className="p-0">
-                        <AspectRatio ratio={16 / 9}>
-                          <Image
-                            src={getImageUrl(image.url)}
-                            alt={image.alternativeText || title}
-                            fill
-                            className="object-cover rounded-lg"
-                          />
-                        </AspectRatio>
-                      </CardContent>
-                    </Card>
+                    <AspectRatio ratio={16 / 9}>
+                      <Image
+                        src={image.url}
+                        alt={image.alt || project.title}
+                        fill
+                        className="object-cover rounded-lg"
+                      />
+                    </AspectRatio>
                   </CarouselItem>
                 ))}
               </CarouselContent>
@@ -119,14 +128,27 @@ export default async function ProjectDetailPage({
         {/* Description */}
         <div>
           <h2 className="text-3xl font-bold mb-4">Project Details</h2>
-          <div
-            className="prose prose-slate prose-lg max-w-none dark:prose-invert"
-            dangerouslySetInnerHTML={{
-              __html: description.replace(/\n/g, "<br />"),
-            }}
-          />
+          <div className="prose prose-slate prose-lg max-w-none dark:prose-invert">
+            <PortableText value={project.description} />
+          </div>
         </div>
       </div>
+
+      {/* Call to Action Section */}
+      <section className="py-20 px-4 bg-teal-600 text-white">
+        <div className="container mx-auto text-center">
+          <h2 className="text-4xl font-bold">
+            Ready to Build Your Dream Space?
+          </h2>
+          <p className="text-lg mt-2 mb-6 max-w-2xl mx-auto">
+            Let's bring this level of quality and craftsmanship to your home.
+            Contact us for a free, no-obligation estimate.
+          </p>
+          <Button asChild size="lg" variant="secondary">
+            <Link href="/contact">Get a Free Estimate</Link>
+          </Button>
+        </div>
+      </section>
     </main>
   );
 }
